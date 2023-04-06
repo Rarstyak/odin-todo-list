@@ -1,6 +1,5 @@
-import PubSub from "pubsub-js";
-import Keys from "./keys.js";
-import Print from './print.js';
+import PubSub from 'pubsub-js';
+import Keys from './keys.js';
 
 const Todo = (title, description, dueDate, priority, done, note) => {
     const _title = title || 'Untitled';
@@ -186,24 +185,6 @@ export default (function() {
     let _viewProjectID = 0;
 
     // Functions
-    function init() {
-        // Module logs to console
-        Print.init();
-        // Set Subscribers
-        PubSub.subscribe(Keys.LOCAL_STORAGE_SAVE, localStorageSave);
-        PubSub.subscribe(Keys.LOCAL_STORAGE_LOAD, localStorageLoad);
-
-        // List Select
-        PubSub.subscribe(Keys.LIST_SELECT, listSelectHandler);
-        // Project Add
-        PubSub.subscribe(Keys.PROJECT_ADD, projectAddHandler);
-        // Project Move
-        // Project Remove
-        // Todo Move
-
-        // Load prior data
-        localStorageLoad();
-    };
 
     const localStorageSave = () => {
         localStorage.setItem('projects', JSON.stringify(_projects));
@@ -249,6 +230,13 @@ export default (function() {
             // PubSub.publish(Keys.DOM_UPDATE_ALL, 'Init default data');
             publishList();
         };
+    };
+
+    const localStorageReset = () => {
+        if (confirm('This will clear local storage. Are you sure?')) {
+            localStorage.removeItem('projects');
+            localStorageLoad();
+        }
     };
 
     // For getting an array of names to make tab buttons out of
@@ -310,8 +298,25 @@ export default (function() {
 
     // const publishTodo = () => {};
 
+    (function init() {
+        // Set Subscribers
+        PubSub.subscribe(Keys.LOCAL_STORAGE_SAVE, localStorageSave);
+        PubSub.subscribe(Keys.LOCAL_STORAGE_LOAD, localStorageLoad);
+        PubSub.subscribe(Keys.LOCAL_STORAGE_RESET, localStorageReset);
+
+        // List Select
+        PubSub.subscribe(Keys.LIST_SELECT, listSelectHandler);
+        // Project Add
+        PubSub.subscribe(Keys.PROJECT_ADD, projectAddHandler);
+        // Project Move
+        // Project Remove
+        // Todo Move
+
+        // Load prior data
+        localStorageLoad();
+    })();
+
     return {
-        init,
         localStorageSave,
         localStorageLoad
     };

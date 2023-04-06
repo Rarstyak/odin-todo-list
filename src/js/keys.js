@@ -1,6 +1,7 @@
 export default (function() {
     const   LOCAL_STORAGE_SAVE = 'local storage save',
             LOCAL_STORAGE_LOAD = 'local storage load',
+            LOCAL_STORAGE_RESET = 'local storage reset',
 
             // List (App) -> (Interface all project tabs)
                 // [] of titles
@@ -44,16 +45,17 @@ export default (function() {
             TODO_REMOVE = 'todo remove';
 
     return {
-        LOCAL_STORAGE_SAVE,
-        LOCAL_STORAGE_LOAD,
+        LOCAL_STORAGE_SAVE, //Done
+        LOCAL_STORAGE_LOAD, //Done
+        LOCAL_STORAGE_RESET, //Done
 
-        DOM_UPDATE_LIST,
-        DOM_UPDATE_PROJECT,
+        DOM_UPDATE_LIST, //Done
+        DOM_UPDATE_PROJECT, //Imcomplete
         DOM_UPDATE_TODO,
 
-        LIST_SELECT,
+        LIST_SELECT, //Done
 
-        PROJECT_ADD,
+        PROJECT_ADD, //Incomplete
         PROJECT_EDIT,
         PROJECT_MOVE,
         PROJECT_REMOVE,

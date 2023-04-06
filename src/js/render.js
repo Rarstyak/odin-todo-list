@@ -1,9 +1,43 @@
-import PubSub from "pubsub-js";
-import Keys from "./keys.js";
+import PubSub from 'pubsub-js';
+import Keys from './keys.js';
 
 // import './css/style.css';
 
-// SaveLoadModule
+const dataModule = (function() {
+
+    // Save All
+    const addSaveBtn = () => {
+        const btn = document.createElement('button');
+        btn.textContent = 'SAVE';
+        btn.classList.add('local-storage-save');
+        btn.addEventListener('click', () => PubSub.publish(Keys.LOCAL_STORAGE_SAVE));
+        return btn;
+    }
+
+    // Load All
+    const addLoadBtn = () => {
+        const btn = document.createElement('button');
+        btn.textContent = 'LOAD';
+        btn.classList.add('local-storage-load');
+        btn.addEventListener('click', () => PubSub.publish(Keys.LOCAL_STORAGE_LOAD));
+        return btn;
+    }
+
+    // Load All
+    const addResetBtn = () => {
+        const btn = document.createElement('button');
+        btn.textContent = 'RESET';
+        btn.classList.add('local-storage-reset');
+        btn.addEventListener('click', () => PubSub.publish(Keys.LOCAL_STORAGE_RESET));
+        return btn;
+    }
+
+    return {
+        addSaveBtn,
+        addLoadBtn,
+        addResetBtn,
+    }
+})();
 
 const listModule = (function() {
     const _tabRef = [];
@@ -92,38 +126,6 @@ export default (function() {
     // Store all of the created tabs and todos
     const _todoRef = [];
 
-    function init() {
-        const saveBtn = addSaveBtn();
-        body.appendChild(saveBtn);
-        const loadBtn = addLoadBtn();
-        body.appendChild(loadBtn);
-
-        const projectBtn = addProjectBtn();
-        body.appendChild(projectBtn);
-
-        const list = listModule.addList();
-        body.appendChild(list);
-
-        const project = projectModule.addProject();
-        body.appendChild(project);
-    };
-
-    // Save All
-    const addSaveBtn = () => {
-        const btn = document.createElement('button');
-        btn.textContent = 'SAVE'
-        btn.addEventListener('click', () => PubSub.publish(Keys.LOCAL_STORAGE_SAVE));
-        return btn;
-    }
-
-    // Load All
-    const addLoadBtn = () => {
-        const btn = document.createElement('button');
-        btn.textContent = 'LOAD'
-        btn.addEventListener('click', () => PubSub.publish(Keys.LOCAL_STORAGE_LOAD));
-        return btn;
-    }
-
     // Project Tabs:: listen for add, move, remove, update
     const addProjectBtn = () => {
         const btn = document.createElement('button');
@@ -135,7 +137,25 @@ export default (function() {
         // Add Todo
         // Edit/Update Todo
 
+    (function init() {
+        const saveBtn = dataModule.addSaveBtn();
+        body.appendChild(saveBtn);
+        const loadBtn = dataModule.addLoadBtn();
+        body.appendChild(loadBtn);
+        const resetBtn = dataModule.addResetBtn();
+        body.appendChild(resetBtn);
+
+        const projectBtn = addProjectBtn();
+        body.appendChild(projectBtn);
+
+        const list = listModule.addList();
+        body.appendChild(list);
+
+        const project = projectModule.addProject();
+        body.appendChild(project);
+    })();
+
     return {
-        init
+
     };
 })();

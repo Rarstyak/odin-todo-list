@@ -1,13 +1,18 @@
-import PubSub from "pubsub-js";
-import Keys from "./keys.js";
+import PubSub from 'pubsub-js';
+import Keys from './keys.js';
 
 // print to console
 
 export default (function() {
 
-    function init() {
+    function logAction(msg, data) {
+        console.log(`Log Action (${msg}): ${data}`);
+    }
+
+    (function init() {
         PubSub.subscribe(Keys.LOCAL_STORAGE_SAVE, logAction);
         PubSub.subscribe(Keys.LOCAL_STORAGE_LOAD, logAction);
+        PubSub.subscribe(Keys.LOCAL_STORAGE_RESET, logAction);
 
         PubSub.subscribe(Keys.DOM_UPDATE_LIST, logAction);
         PubSub.subscribe(Keys.DOM_UPDATE_PROJECT, logAction);
@@ -24,13 +29,9 @@ export default (function() {
         PubSub.subscribe(Keys.TODO_EDIT, logAction);
         PubSub.subscribe(Keys.TODO_MOVE, logAction);
         PubSub.subscribe(Keys.TODO_REMOVE, logAction);
-    };
-
-    function logAction(msg, data) {
-        console.log(`Log Action (${msg}): ${data}`);
-    }
+    })();
 
     return {
-        init
+        
     };
 })();

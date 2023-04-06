@@ -1,7 +1,7 @@
-import App from "./js/app";
-import Render from './js/render.js';
+import './js/render.js';
+import './js/print.js';
+import './js/app';
 
-(function setUp() {
-    Render.init();
-    App.init();
-})();
+// (function setUp() {
+//     // Placeholder
+// })();

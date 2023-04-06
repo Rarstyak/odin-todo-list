@@ -102,10 +102,10 @@ const Todo = (title, description, dueDate, priority, done, note) => {
             setNote(note)
         ].some(i => i);
         if (changed) {
-            // PubSub.publish(Keys.TODO_UPDATE, 'changes made');
+            // PubSub.publish(Keys.TODO_UPDATE_TODO, 'changes made');
             return true;
         } else {
-            // PubSub.publish(Keys.TODO_UPDATE, 'no changes made');
+            // PubSub.publish(Keys.TODO_UPDATE_TODO, 'no changes made'); x unnecessary, only publish if change made ? NO, because we need to shut down the edit section
             return false;
         }
     }
@@ -183,6 +183,7 @@ const Project = (title, description) => {
 
 export default (function() {
     const _projects = [];
+    let _viewProjectID = 0;
 
     // Functions
     function init() {
@@ -192,10 +193,13 @@ export default (function() {
         PubSub.subscribe(Keys.LOCAL_STORAGE_SAVE, localStorageSave);
         PubSub.subscribe(Keys.LOCAL_STORAGE_LOAD, localStorageLoad);
 
-        // Todo Move
+        // List Select
+        PubSub.subscribe(Keys.LIST_SELECT, listSelectHandler);
         // Project Add
+        PubSub.subscribe(Keys.PROJECT_ADD, projectAddHandler);
         // Project Move
         // Project Remove
+        // Todo Move
 
         // Load prior data
         localStorageLoad();
@@ -206,6 +210,7 @@ export default (function() {
     };
 
     const localStorageLoad = () => {
+        _viewProjectID = 0;
         _projects.length = 0;
         // Rebuild all projects from local storage, if there are none, create a default
         const dataProjects = JSON.parse(localStorage.getItem('projects')) || [];
@@ -232,7 +237,8 @@ export default (function() {
                     });
                 }
             });
-            PubSub.publish(Keys.DOM_UPDATE, 'Load prior data');
+            // PubSub.publish(Keys.DOM_UPDATE_ALL, 'Load prior data');
+            publishList();
         } else {
             // Init default placeholders
             const initProject = Project('Default', 'The default project');
@@ -240,10 +246,12 @@ export default (function() {
             initProject.addTodo(Todo('1'));
             initProject.addTodo(Todo('2', 'yeet'));
             initProject.addTodo(Todo('3'));
-            PubSub.publish(Keys.DOM_UPDATE, 'Init default data');
+            // PubSub.publish(Keys.DOM_UPDATE_ALL, 'Init default data');
+            publishList();
         };
     };
 
+    // For getting an array of names to make tab buttons out of
     const getProjectTitles = () => {
         let titles = _projects.map((project) => {
             return project.getTitle();
@@ -256,6 +264,15 @@ export default (function() {
         return project;
     };
 
+    const projectAddHandler = (msg, data) => {
+        const project = Project(
+            data.title,
+            data.description
+        );
+        addProject(project);
+        publishList();
+    };
+
     // deleteProject = (project, transferTodos)
 
     // moveTodo = (project)
@@ -263,6 +280,35 @@ export default (function() {
     // updateTodo
 
     // deleteTodo
+
+    const getCurrentProjectInfo = () => {
+        const currentProject = _projects[_viewProjectID];
+        return {
+            title: currentProject.getTitle(),
+            description: currentProject.getDescription(),
+        }
+    };
+
+    const listSelectHandler = (msg, data) => {
+        _viewProjectID = data;
+        publishProject();
+    };
+
+    // const publishAll = () => {
+    //     publishList();
+    // };
+
+    const publishList = () => {
+        PubSub.publish(Keys.DOM_UPDATE_LIST, getProjectTitles());
+        publishProject();
+    };
+
+    const publishProject = () => {
+        PubSub.publish(Keys.DOM_UPDATE_PROJECT, getCurrentProjectInfo());
+        // publishTodo();
+    };
+
+    // const publishTodo = () => {};
 
     return {
         init,

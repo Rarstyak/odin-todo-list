@@ -175,7 +175,7 @@ const Project = (title, description) => {
         getTitle, getDescription,
         setTitle, setDescription,
         update,
-        addTodo,
+        addTodo, getTodos,
         toJSON
     }
 };
@@ -240,7 +240,7 @@ export default (function() {
     };
 
     // For getting an array of names to make tab buttons out of
-    const getProjectTitles = () => {
+    const getCurrentListInfo = () => {
         let titles = _projects.map((project) => {
             return project.getTitle();
         });
@@ -262,6 +262,19 @@ export default (function() {
     };
 
     // deleteProject = (project, transferTodos)
+
+    const todoAddHandler = (msg, dataTodo) => {
+        const todo = Todo(
+            dataTodo.title,
+            dataTodo.description,
+            dataTodo.dueDate,
+            dataTodo.priority,
+            dataTodo.done,
+            dataTodo.note
+        );
+        _projects[_viewProjectID].addTodo(todo);
+        publishTodo();
+    };
 
     // moveTodo = (project)
 
@@ -286,17 +299,23 @@ export default (function() {
     //     publishList();
     // };
 
+    const getCurrentTodoInfo = () => {
+        return _projects[_viewProjectID].getTodos();
+    };
+
     const publishList = () => {
-        PubSub.publish(Keys.DOM_UPDATE_LIST, getProjectTitles());
+        PubSub.publish(Keys.DOM_UPDATE_LIST, getCurrentListInfo());
         publishProject();
     };
 
     const publishProject = () => {
         PubSub.publish(Keys.DOM_UPDATE_PROJECT, getCurrentProjectInfo());
-        // publishTodo();
+        publishTodo();
     };
 
-    // const publishTodo = () => {};
+    const publishTodo = () => {
+        PubSub.publish(Keys.DOM_UPDATE_TODO, getCurrentTodoInfo());
+    };
 
     (function init() {
         // Set Subscribers
@@ -311,6 +330,7 @@ export default (function() {
         // Project Move
         // Project Remove
         // Todo Move
+        PubSub.subscribe(Keys.TODO_ADD, todoAddHandler);
 
         // Load prior data
         localStorageLoad();

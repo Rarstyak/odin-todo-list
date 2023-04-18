@@ -44,8 +44,29 @@ const listModule = (function() {
 
     const initList = () => {
         PubSub.subscribe(Keys.DOM_UPDATE_LIST, renderList);
+        
         const div = document.createElement('div');
-        div.setAttribute('id', 'project-tabs-container');
+        
+        const divTabs = document.createElement('span');
+        divTabs.setAttribute('id', 'project-tabs-container');
+        
+        const divAdd = document.createElement('span');
+        divAdd.setAttribute('id', 'project-add-container');
+
+        // Add button to create new project/tab
+        const addProjectBtn = () => {
+            const btn = document.createElement('button');
+            btn.textContent = '+'
+            btn.addEventListener('click', () => PubSub.publish(Keys.PROJECT_ADD, {title: prompt('Project Name', 'Untitled'), description: prompt('Project Description', 'test')}));
+            return btn;
+        };
+
+        const projectBtn = addProjectBtn();
+        divAdd.appendChild(projectBtn);
+
+        div.appendChild(divTabs);
+        div.appendChild(divAdd);
+
         return div;
     };
 
@@ -72,9 +93,11 @@ const listModule = (function() {
         // Remove unnecessary tabs and update text for the rest
         for (let i = tabRefLen - 1; i >= 0; i-= 1) {
             if (i >= dataLen) {
-                _tabRef.pop();
-                container.lastChild.remove();
+                // _tabRef.pop();
+                // container.lastChild.remove();
+                _tabRef[i].style.display = 'none';
             } else {
+                _tabRef[i].style.display = '';
                 _tabRef[i].textContent = data[i];
             }
         }
@@ -125,16 +148,45 @@ const todoModule = (function() {
 
     const initTodo = () => {
         PubSub.subscribe(Keys.DOM_UPDATE_TODO, renderTodoArray);
+        
         const div = document.createElement('div');
-        div.setAttribute('id', 'todo-cards-container');
+        // div.setAttribute('id', 'todo-container');
+        
+        const divCards = document.createElement('div');
+        divCards.setAttribute('id', 'todo-cards-container');
+        
+        const divAdd = document.createElement('div');
+        divAdd.setAttribute('id', 'todo-add-container');
+
+
+        const addTodoBtn = () => {
+            const btn = document.createElement('button');
+            btn.textContent = 'Add Todo'
+            btn.addEventListener('click', () => PubSub.publish(Keys.TODO_ADD, {title: prompt('Todo Title', 'Test'), description: prompt('Todo Description', '')}));
+            return btn;
+        };
+        const addBtn = addTodoBtn();
+        divAdd.appendChild(addBtn);
+
+        div.appendChild(divCards);
+        div.appendChild(divAdd);
+
         return div;
     };
 
     const buildTodoCard = (index) => {
         const card = document.createElement('div');
         card.classList.add('todo-card');
-        // card.addEventListener('click', () => PubSub.publish(Keys.LIST_SELECT, i));
-        
+
+        const done = document.createElement('button');
+        done.classList.add('done');
+        done.addEventListener('click', () => PubSub.publish(Keys.TODO_TOGGLE, {index: index}));
+        card.appendChild(done);
+
+        const info = document.createElement('div');
+        info.classList.add('info');
+        card.appendChild(info);
+
         // Checkbox done - checkbox
         // Prioirty indicator - img
         // Title,Duedate,Description,Note - divs for text, cssgrid
@@ -144,12 +196,17 @@ const todoModule = (function() {
 
     const updateTodoCard = (todoCardRef, data) => {
         // UPDATE HERE
-        todoCardRef.textContent = data.title + ' ' + data.description;
-            // title
+
+        const done = todoCardRef.querySelector('.done');
+        done.textContent = `${(data.done) ? 'DONE' : 'NOT DONE'}`;
+
+        const info = todoCardRef.querySelector('.info');
+        info.textContent = `${data.title}-${data.description}`;
+
+        // title
             // description
             // dueDate
             // priority
-            // done
             // note
     };
 
@@ -174,9 +231,9 @@ const todoModule = (function() {
         // Remove unnecessary tabs and update text for the rest
         for (let i = tabRefLen - 1; i >= 0; i-= 1) {
             if (i >= dataLen) {
-                _todoCardRef.pop();
-                container.lastChild.remove();
+                _todoCardRef[i].style.display = 'none';
             } else {
+                _todoCardRef[i].style.display = '';
                 updateTodoCard(_todoCardRef[i], data[i]);
             }
         }
@@ -194,21 +251,14 @@ export default (function() {
     const _todoRef = [];
 
     // Project Tabs:: listen for add, move, remove, update
-    const addProjectBtn = () => {
-        const btn = document.createElement('button');
-        btn.textContent = 'Add Project'
-        btn.addEventListener('click', () => PubSub.publish(Keys.PROJECT_ADD, {title: "Test PABtn", description: 'la de da'}));
-        return btn;
-    };
 
-        // Add Todo
-    const addTodoBtn = () => {
+    // Edit/Update Todo
+    const editTodoBtn = () => {
         const btn = document.createElement('button');
-        btn.textContent = 'Add Todo'
-        btn.addEventListener('click', () => PubSub.publish(Keys.TODO_ADD, {title: "Test new todo", description: 'la de da'}));
+        btn.textContent = 'Edit Todo'
+        btn.addEventListener('click', () => PubSub.publish(Keys.TODO_EDIT, {title: "Try to edit this", description: 'hit index 1', index: 1}));
         return btn;
     };
-        // Edit/Update Todo
 
     (function init() {
         const saveBtn = dataModule.addSaveBtn();
@@ -218,11 +268,8 @@ export default (function() {
         const resetBtn = dataModule.addResetBtn();
         body.appendChild(resetBtn);
 
-        const projectBtn = addProjectBtn();
-        body.appendChild(projectBtn);
-
-        const todoBtn = addTodoBtn();
-        body.appendChild(todoBtn);
+        const todoEditBtn = editTodoBtn();
+        body.appendChild(todoEditBtn);
 
         const list = listModule.initList();
         body.appendChild(list);

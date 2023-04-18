@@ -15,6 +15,7 @@ export default (function() {
             // Edit (Interface) -> (App Project List)
                 // data = project id in _projects via button id
             LIST_SELECT = 'list select',
+            TODO_TOGGLE = 'todo toggle',
 
             // Add (Interface) -> (App ^ Project List)
                 // data.title, data.description
@@ -54,6 +55,7 @@ export default (function() {
         DOM_UPDATE_TODO,
 
         LIST_SELECT, //Done
+        TODO_TOGGLE,
 
         PROJECT_ADD, //Incomplete
         PROJECT_EDIT,

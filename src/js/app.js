@@ -2,19 +2,19 @@ import PubSub from 'pubsub-js';
 import Keys from './keys.js';
 
 const Todo = (title, description, dueDate, priority, done, note) => {
-    const _title = title || 'Untitled';
-    const _description = description || '';
-    const _dueDate = dueDate || '';
-    const _priority = priority || '';
-    const _done = done || false;
-    const _note = note || '';
+    let _title = title || 'Untitled';
+    let _description = description || '';
+    let _dueDate = dueDate || '';
+    let _priority = priority || '';
+    let _done = done || false;
+    let _note = note || '';
 
     const getTitle = () => {
         return _title;
     };
 
     const setTitle = (title) => {
-        if (getTitle() == title) {
+        if (_title == title || title == undefined) {
             return false;
         } else {
             _title = title;
@@ -27,7 +27,7 @@ const Todo = (title, description, dueDate, priority, done, note) => {
     };
 
     const setDescription = (description) => {
-        if (getDescription() == description) {
+        if (_description == description || description == undefined) {
             return false;
         } else {
             _description = description;
@@ -40,7 +40,7 @@ const Todo = (title, description, dueDate, priority, done, note) => {
     };
 
     const setDueDate = (dueDate) => {
-        if (getDueDate() == dueDate) {
+        if (_dueDate == dueDate || dueDate == undefined) {
             return false;
         } else {
             _dueDate = dueDate;
@@ -53,7 +53,7 @@ const Todo = (title, description, dueDate, priority, done, note) => {
     };
 
     const setPriority = (priority) => {
-        if (getPriority() == priority) {
+        if (_priority == priority || priority == undefined) {
             return false;
         } else {
             _priority = priority;
@@ -66,7 +66,7 @@ const Todo = (title, description, dueDate, priority, done, note) => {
     };
 
     const setDone = (done) => {
-        if (getDone() == done) {
+        if (_done == done || done == undefined) {
             return false;
         } else {
             _done = done;
@@ -76,6 +76,7 @@ const Todo = (title, description, dueDate, priority, done, note) => {
 
     const toggleDone = () => {
         _done = !_done;
+        return true;
     }
 
     const getNote = () => {
@@ -83,7 +84,7 @@ const Todo = (title, description, dueDate, priority, done, note) => {
     };
 
     const setNote = (note) => {
-        if (getNote() == note) {
+        if (_note == note || note == undefined) {
             return false;
         } else {
             _note = note;
@@ -100,13 +101,7 @@ const Todo = (title, description, dueDate, priority, done, note) => {
             setDone(done),
             setNote(note)
         ].some(i => i);
-        if (changed) {
-            // PubSub.publish(Keys.TODO_UPDATE_TODO, 'changes made');
-            return true;
-        } else {
-            // PubSub.publish(Keys.TODO_UPDATE_TODO, 'no changes made'); x unnecessary, only publish if change made ? NO, because we need to shut down the edit section
-            return false;
-        }
+        return changed;
     }
 
     const toJSON = () => {
@@ -128,8 +123,8 @@ const Todo = (title, description, dueDate, priority, done, note) => {
 };
 
 const Project = (title, description) => {
-    const _title = title || 'Untitled';
-    const _description = description || '';
+    let _title = title || 'Untitled';
+    let _description = description || '';
     const _todos = [];
 
     const getTitle = () => {
@@ -137,27 +132,52 @@ const Project = (title, description) => {
     };
 
     const setTitle = (title) => {
-        _title = title;
-    }
+        if (_title == title || title == undefined) {
+            return false;
+        } else {
+            _title = title;
+            return true;
+        }
+    };
 
     const getDescription = () => {
         return _description;
     };
 
     const setDescription = (description) => {
-        _description = description;
-    }
+        if (_description == description || description == undefined) {
+            return false;
+        } else {
+            _description = description;
+            return true;
+        }
+    };
 
     const update = (title, description) => {
-        setTitle(title);
-        setDescription(description);
+        const changed = [
+            setTitle(title),
+            setDescription(description)
+        ].some(i => i);
+        return changed;
     };
 
     const addTodo = (todo) => {
         _todos.push(todo);
     };
 
-    const getTodos = () => {
+    const editTodo = (index, title, description, dueDate, priority, done, note) => {
+        return _todos[index].update(title, description, dueDate, priority, done, note);
+    }
+
+    const toggleTodo = (index) => {
+        return _todos[index].toggleDone();
+    }
+
+    const moveTodo = (a, b) => {
+        // asdf
+    }
+
+    const getTodosJSON = () => {
         return _todos.map( (todo) => {
             return todo.toJSON();
         });
@@ -167,7 +187,7 @@ const Project = (title, description) => {
         return {
             title: getTitle(),
             description: getDescription(),
-            todos: getTodos(),
+            todos: getTodosJSON(),
         }
     }
 
@@ -175,7 +195,7 @@ const Project = (title, description) => {
         getTitle, getDescription,
         setTitle, setDescription,
         update,
-        addTodo, getTodos,
+        addTodo, editTodo, toggleTodo, getTodosJSON,
         toJSON
     }
 };
@@ -248,8 +268,7 @@ export default (function() {
     };
 
     const addProject = (project) => {
-        _projects.push(project);
-        return project;
+        return _projects.push(project);
     };
 
     const projectAddHandler = (msg, data) => {
@@ -257,9 +276,24 @@ export default (function() {
             data.title,
             data.description
         );
-        addProject(project);
+        const count = addProject(project);
         publishList();
+        listSelectHandler(null, count-1);
     };
+
+    const projectEditHandler = (msg, data) => {
+        const changed = _projects[_viewProjectID].update(
+            data.title,
+            data.description
+        );
+        if (changed) {
+            publishList();
+        }
+    };
+
+    const projectMoveHandler = (msg, data) => {
+        // data.a data.b
+    }
 
     // deleteProject = (project, transferTodos)
 
@@ -274,6 +308,27 @@ export default (function() {
         );
         _projects[_viewProjectID].addTodo(todo);
         publishTodo();
+    };
+
+    const todoEditHandler = (msg, dataTodo) => {
+        const changed = _projects[_viewProjectID].editTodo(dataTodo.index,
+            dataTodo.title,
+            dataTodo.description,
+            dataTodo.dueDate,
+            dataTodo.priority,
+            dataTodo.done,
+            dataTodo.note
+        );
+        if (changed) {
+            publishTodo();
+        }
+    };
+
+    const todoToggleHandler = (msg, dataTodo) => {
+        const changed = _projects[_viewProjectID].toggleTodo(dataTodo.index);
+        if (changed) {
+            publishTodo();
+        }
     };
 
     // moveTodo = (project)
@@ -300,7 +355,7 @@ export default (function() {
     // };
 
     const getCurrentTodoInfo = () => {
-        return _projects[_viewProjectID].getTodos();
+        return _projects[_viewProjectID].getTodosJSON();
     };
 
     const publishList = () => {
@@ -325,12 +380,17 @@ export default (function() {
 
         // List Select
         PubSub.subscribe(Keys.LIST_SELECT, listSelectHandler);
-        // Project Add
+        PubSub.subscribe(Keys.TODO_TOGGLE, todoToggleHandler);
+        // Project
         PubSub.subscribe(Keys.PROJECT_ADD, projectAddHandler);
+        PubSub.subscribe(Keys.PROJECT_EDIT, projectEditHandler);
         // Project Move
         // Project Remove
-        // Todo Move
+        // Todo
         PubSub.subscribe(Keys.TODO_ADD, todoAddHandler);
+        PubSub.subscribe(Keys.TODO_EDIT, todoEditHandler);
+        // Todo Move
+        // Todo Remove
 
         // Load prior data
         localStorageLoad();

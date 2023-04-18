@@ -19,6 +19,7 @@ export default (function() {
         PubSub.subscribe(Keys.DOM_UPDATE_TODO, logAction);
 
         PubSub.subscribe(Keys.LIST_SELECT, logAction);
+        PubSub.subscribe(Keys.TODO_TOGGLE, logAction);
 
         PubSub.subscribe(Keys.PROJECT_ADD, logAction);
         PubSub.subscribe(Keys.PROJECT_EDIT, logAction);

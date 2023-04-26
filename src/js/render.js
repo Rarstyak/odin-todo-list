@@ -1,7 +1,7 @@
 import PubSub from 'pubsub-js';
 import Keys from './keys.js';
 
-// import './css/style.css';
+import '.././css/style.css';
 
 const dataModule = (function() {
 
@@ -46,11 +46,12 @@ const listModule = (function() {
         PubSub.subscribe(Keys.DOM_UPDATE_LIST, renderList);
         
         const div = document.createElement('div');
+        div.setAttribute('id', 'list-container');
         
-        const divTabs = document.createElement('span');
+        const divTabs = document.createElement('div');
         divTabs.setAttribute('id', 'project-tabs-container');
         
-        const divAdd = document.createElement('span');
+        const divAdd = document.createElement('div');
         divAdd.setAttribute('id', 'project-add-container');
 
         // Add button to create new project/tab
@@ -150,7 +151,7 @@ const todoModule = (function() {
         PubSub.subscribe(Keys.DOM_UPDATE_TODO, renderTodoArray);
         
         const div = document.createElement('div');
-        // div.setAttribute('id', 'todo-container');
+        div.setAttribute('id', 'todo-container');
         
         const divCards = document.createElement('div');
         divCards.setAttribute('id', 'todo-cards-container');
@@ -180,12 +181,32 @@ const todoModule = (function() {
 
         const done = document.createElement('button');
         done.classList.add('done');
-        done.addEventListener('click', () => PubSub.publish(Keys.TODO_TOGGLE, {index: index}));
+        done.addEventListener('click', () => PubSub.publish(Keys.TODO_TOGGLE, index));
         card.appendChild(done);
 
         const info = document.createElement('div');
         info.classList.add('info');
         card.appendChild(info);
+
+        const title = document.createElement('div');
+        title.classList.add('title');
+        info.appendChild(title);
+
+        const description = document.createElement('div');
+        description.classList.add('description');
+        info.appendChild(description);
+
+        const edit = document.createElement('button');
+        edit.classList.add('edit');
+        edit.textContent = 'Edit';
+        edit.addEventListener('click', () => PubSub.publish(Keys.TODO_EDIT, {title: prompt('New Title'), description: prompt('New Description'), index: index}));
+        card.appendChild(edit);
+
+        const remove = document.createElement('button');
+        remove.classList.add('remove');
+        remove.textContent = 'X';
+        remove.addEventListener('click', () => PubSub.publish(Keys.TODO_REMOVE, index));
+        card.appendChild(remove);
 
         // Checkbox done - checkbox
         // Prioirty indicator - img
@@ -198,10 +219,13 @@ const todoModule = (function() {
         // UPDATE HERE
 
         const done = todoCardRef.querySelector('.done');
-        done.textContent = `${(data.done) ? 'DONE' : 'NOT DONE'}`;
+        done.textContent = `${(data.done) ? 'Y' : 'N'}`;
 
-        const info = todoCardRef.querySelector('.info');
-        info.textContent = `${data.title}-${data.description}`;
+        const title = todoCardRef.querySelector('.title');
+        title.textContent = `${data.title}`;
+
+        const description = todoCardRef.querySelector('.description');
+        description.textContent = `${data.description}`;
 
         // title
             // description
@@ -253,23 +277,19 @@ export default (function() {
     // Project Tabs:: listen for add, move, remove, update
 
     // Edit/Update Todo
-    const editTodoBtn = () => {
-        const btn = document.createElement('button');
-        btn.textContent = 'Edit Todo'
-        btn.addEventListener('click', () => PubSub.publish(Keys.TODO_EDIT, {title: "Try to edit this", description: 'hit index 1', index: 1}));
-        return btn;
-    };
+    
 
     (function init() {
-        const saveBtn = dataModule.addSaveBtn();
-        body.appendChild(saveBtn);
-        const loadBtn = dataModule.addLoadBtn();
-        body.appendChild(loadBtn);
-        const resetBtn = dataModule.addResetBtn();
-        body.appendChild(resetBtn);
+        const storage = document.createElement('div');
+        storage.setAttribute('id', 'storage-container');
+        body.appendChild(storage);
 
-        const todoEditBtn = editTodoBtn();
-        body.appendChild(todoEditBtn);
+        const saveBtn = dataModule.addSaveBtn();
+        storage.appendChild(saveBtn);
+        const loadBtn = dataModule.addLoadBtn();
+        storage.appendChild(loadBtn);
+        const resetBtn = dataModule.addResetBtn();
+        storage.appendChild(resetBtn);
 
         const list = listModule.initList();
         body.appendChild(list);

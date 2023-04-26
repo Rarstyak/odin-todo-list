@@ -1,0 +1,63 @@
+html {
+    font-size: 16px;
+}
+
+body {
+    margin: 0px;
+    height: 100vh;
+    width: 100vw;
+    
+    display: grid;
+    grid: 
+        "storage project" 10rem
+        "list todo" 1fr
+        / 5rem 1fr;
+}
+
+#storage-container {
+    grid-area: storage;
+}
+
+#list-container {
+    grid-area: list;
+}
+
+#project-container {
+    grid-area: project;
+}
+
+#todo-container {
+    grid-area: todo;
+}
+
+.todo-card {
+    display: grid;
+    grid:
+        "done info edit remove" 3rem
+        / 3rem 11rem 3rem 3rem;
+}
+
+.todo-card .done {
+    grid-area: done;
+}
+
+.todo-card .info {
+    grid-area: info;
+    padding: 0.5rem;
+}
+
+.todo-card .info .title {
+    font-size: 1rem;
+}
+
+.todo-card .info .description {
+    font-size: 0.75rem;
+}
+
+.todo-card .edit {
+    grid-area: edit;
+}
+
+.todo-card .remove {
+    grid-area: remove;
+}

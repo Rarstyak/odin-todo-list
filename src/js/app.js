@@ -173,8 +173,22 @@ const Project = (title, description) => {
         return _todos[index].toggleDone();
     }
 
-    const moveTodo = (a, b) => {
-        // asdf
+    const removeTodo = (index) => {
+        _todos.splice(index, 1);
+    }
+
+    // const moveTodo = (a, b) => {
+    //     // asdf
+    // }
+
+    const getDone = () => {
+        return _todos.reduce((sum, todo) => {
+            sum = todo.getDone() ? 1 : 0;
+        }, 0);
+    }
+
+    const getTotal = () => {
+        return _todos.length;
     }
 
     const getTodosJSON = () => {
@@ -195,7 +209,7 @@ const Project = (title, description) => {
         getTitle, getDescription,
         setTitle, setDescription,
         update,
-        addTodo, editTodo, toggleTodo, getTodosJSON,
+        addTodo, editTodo, toggleTodo, removeTodo, getTodosJSON,
         toJSON
     }
 };
@@ -324,11 +338,16 @@ export default (function() {
         }
     };
 
-    const todoToggleHandler = (msg, dataTodo) => {
-        const changed = _projects[_viewProjectID].toggleTodo(dataTodo.index);
+    const todoToggleHandler = (msg, index) => {
+        const changed = _projects[_viewProjectID].toggleTodo(index);
         if (changed) {
             publishTodo();
         }
+    };
+
+    const todoRemoveHandler = (msg, index) => {
+        _projects[_viewProjectID].removeTodo(index);
+        publishTodo();
     };
 
     // moveTodo = (project)
@@ -345,8 +364,8 @@ export default (function() {
         }
     };
 
-    const listSelectHandler = (msg, data) => {
-        _viewProjectID = data;
+    const listSelectHandler = (msg, index) => {
+        _viewProjectID = index;
         publishProject();
     };
 
@@ -391,6 +410,7 @@ export default (function() {
         PubSub.subscribe(Keys.TODO_EDIT, todoEditHandler);
         // Todo Move
         // Todo Remove
+        PubSub.subscribe(Keys.TODO_REMOVE, todoRemoveHandler);
 
         // Load prior data
         localStorageLoad();

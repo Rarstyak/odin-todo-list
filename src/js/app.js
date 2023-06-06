@@ -341,7 +341,7 @@ export default (function() {
     const projectRemoveHandler = (msg, index = _viewProjectID) => {
         if (_projects.length > 1 && index < _projects.length) {
             _projects.splice(index, 1);
-            _viewProjectID -= _viewProjectID == index ? 1 : 0;
+            _viewProjectID -= index <= _viewProjectID ? 1 : 0;
             publishList();
         }
     }

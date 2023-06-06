@@ -149,6 +149,7 @@ const listModule = (function() {
                 _tabRef.push(tab);
                 // tab.setAttribute('data-tab-number', i); This is unnecessary if we can directly publish with an id
                 tab.addEventListener('click', () => PubSub.publish(Keys.LIST_SELECT, i));
+                tab.addEventListener('auxclick', () => PubSub.publish(Keys.PROJECT_REMOVE, i));
             }
         }
 

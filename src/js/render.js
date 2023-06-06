@@ -109,9 +109,8 @@ const listModule = (function() {
                     title: title.value,
                     description: desc.value
                 });
-
-                // Clear form
-                form.reset();
+                
+                toggleBtnForm();
             }
 
             return form;
@@ -189,6 +188,16 @@ const projectModule = (function() {
         const description = document.createElement('p');
         description.setAttribute('id', 'project-description');
         div.appendChild(description);
+
+        // const edit = document.createElement('button');
+        // edit.setAttribute('id', 'project-edit');
+        // div.appendChild(edit);
+
+        const remove = document.createElement('button');
+        remove.setAttribute('id', 'project-remove');
+        remove.textContent = 'REMOVE';
+        remove.addEventListener('click', () => PubSub.publish(Keys.PROJECT_REMOVE));
+        div.appendChild(remove);
 
         return div;
     };

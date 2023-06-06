@@ -177,8 +177,24 @@ const Project = (title, description) => {
         _todos.splice(index, 1);
     }
 
-    // const moveTodo = (a, b) => {
-    //     // asdf
+    const moveTodo = (indexA, indexB) => {
+        // Move todo at index a to index b
+        const holdA = _todos[a];
+        if (indexA < indexB) {
+            _todos.splice(indexB, 0, holdA);
+            _todos.splice(indexA, 1);
+        } else {
+            _todos.splice(indexA, 1);
+            _todos.splice(indexB, 0, holdA);
+        }
+    }
+
+    // const moveTodoUp = (index) => {
+    //     moveTodo(index, index+1);
+    // }
+
+    // const moveTodoDown = (index) => {
+    //     moveTodo(index, index-1);
     // }
 
     const getDone = () => {
@@ -209,7 +225,7 @@ const Project = (title, description) => {
         getTitle, getDescription,
         setTitle, setDescription,
         update,
-        addTodo, editTodo, toggleTodo, removeTodo, getTodosJSON,
+        addTodo, editTodo, toggleTodo, removeTodo, moveTodo, getTodosJSON,
         toJSON
     }
 };
@@ -218,7 +234,13 @@ export default (function() {
     const _projects = [];
     let _viewProjectID = 0;
 
-    // Functions
+    // Helper Functions
+
+    const addProject = (project) => {
+        return _projects.push(project);
+    };
+
+    // Handler Functions
 
     const localStorageSave = () => {
         localStorage.setItem('projects', JSON.stringify(_projects));
@@ -273,16 +295,16 @@ export default (function() {
         }
     };
 
-    // For getting an array of names to make tab buttons out of
-    const getCurrentListInfo = () => {
-        let titles = _projects.map((project) => {
-            return project.getTitle();
-        });
-        return titles;
+    const listSelectHandler = (msg, index) => {
+        _viewProjectID = index;
+        publishProject();
     };
 
-    const addProject = (project) => {
-        return _projects.push(project);
+    const todoToggleHandler = (msg, index) => {
+        const changed = _projects[_viewProjectID].toggleTodo(index);
+        if (changed) {
+            publishTodo();
+        }
     };
 
     const projectAddHandler = (msg, data) => {
@@ -306,10 +328,19 @@ export default (function() {
     };
 
     const projectMoveHandler = (msg, data) => {
-        // data.a data.b
+        const holdA = _projects[data.indexA];
+        if (data.indexA < data.indexB) {
+            _projects.splice(data.indexB, 0, holdA);
+            _projects.splice(data.indexA, 1);
+        } else {
+            _projects.splice(data.indexA, 1);
+            _projects.splice(data.indexB, 0, holdA);
+        }
     }
 
-    // deleteProject = (project, transferTodos)
+    const projectRemoveHandler = (msg, index) => {
+        _projects[_viewProjectID].splice(index, 1);
+    }
 
     const todoAddHandler = (msg, dataTodo) => {
         const todo = Todo(
@@ -338,23 +369,24 @@ export default (function() {
         }
     };
 
-    const todoToggleHandler = (msg, index) => {
-        const changed = _projects[_viewProjectID].toggleTodo(index);
-        if (changed) {
-            publishTodo();
-        }
-    };
+    const todoMoveHandler = (msg, data) => {
+        _projects[_viewProjectID].moveTodo(data.indexA, data.indexB);
+    }
 
     const todoRemoveHandler = (msg, index) => {
         _projects[_viewProjectID].removeTodo(index);
         publishTodo();
     };
 
-    // moveTodo = (project)
+    // DOM update Functions
 
-    // updateTodo
-
-    // deleteTodo
+    // For getting an array of names to make tab buttons out of
+    const getCurrentListInfo = () => {
+        let titles = _projects.map((project) => {
+            return project.getTitle();
+        });
+        return titles;
+    };
 
     const getCurrentProjectInfo = () => {
         const currentProject = _projects[_viewProjectID];
@@ -363,15 +395,6 @@ export default (function() {
             description: currentProject.getDescription(),
         }
     };
-
-    const listSelectHandler = (msg, index) => {
-        _viewProjectID = index;
-        publishProject();
-    };
-
-    // const publishAll = () => {
-    //     publishList();
-    // };
 
     const getCurrentTodoInfo = () => {
         return _projects[_viewProjectID].getTodosJSON();
@@ -403,13 +426,12 @@ export default (function() {
         // Project
         PubSub.subscribe(Keys.PROJECT_ADD, projectAddHandler);
         PubSub.subscribe(Keys.PROJECT_EDIT, projectEditHandler);
-        // Project Move
-        // Project Remove
+        PubSub.subscribe(Keys.PROJECT_MOVE, projectMoveHandler);
+        PubSub.subscribe(Keys.PROJECT_REMOVE, projectRemoveHandler);
         // Todo
         PubSub.subscribe(Keys.TODO_ADD, todoAddHandler);
         PubSub.subscribe(Keys.TODO_EDIT, todoEditHandler);
-        // Todo Move
-        // Todo Remove
+        PubSub.subscribe(Keys.TODO_MOVE, todoMoveHandler);
         PubSub.subscribe(Keys.TODO_REMOVE, todoRemoveHandler);
 
         // Load prior data

@@ -57,13 +57,78 @@ const listModule = (function() {
         // Add button to create new project/tab
         const addProjectBtn = () => {
             const btn = document.createElement('button');
-            btn.textContent = '+'
-            btn.addEventListener('click', () => PubSub.publish(Keys.PROJECT_ADD, {title: prompt('Project Name', 'Untitled'), description: prompt('Project Description', 'test')}));
+            btn.textContent = '+';
+            btn.addEventListener('click', () => toggleBtnForm());
+            btn.style.display = 'block';
             return btn;
         };
 
+        // New project form
+        const addProjectForm = () => {
+            const form = document.createElement('form');
+            form.id = 'project-form'
+            form.action = '';
+            form.method = 'get';
+
+            const title = document.createElement('input');
+            title.type = 'text';
+            title.name = 'title';
+            title.id = 'project-form-title';
+            title.required = true;
+            title.placeholder = 'Project Name';
+
+            const desc = document.createElement('input');
+            desc.type = 'text';
+            desc.name = 'desc';
+            desc.id = 'project-form-desc';
+            desc.placeholder = 'Project Description';
+
+            const cancel = document.createElement('button');
+            cancel.textContent = 'Cancel';
+            cancel.type = 'button';
+            cancel.addEventListener('click', () => toggleBtnForm());
+
+            const submit = document.createElement('button');
+            submit.textContent = 'Submit';
+
+            form.appendChild(title);
+            form.appendChild(desc);
+            form.appendChild(cancel);
+            form.appendChild(submit);
+
+            form.style.display = 'none';
+
+            form.addEventListener('submit', formSubmit);
+
+            function formSubmit(e) {
+                e.preventDefault();
+                // Validation here
+
+                // PubSub and clear form
+                PubSub.publish(Keys.PROJECT_ADD, {
+                    title: title.value,
+                    description: desc.value
+                });
+
+                // Clear form
+                form.reset();
+            }
+
+            return form;
+        }
+        //
+
         const projectBtn = addProjectBtn();
+        const projectForm = addProjectForm();
+
+        const toggleBtnForm = () => {
+            projectBtn.style.display = projectBtn.style.display === 'block' ? 'none' : 'block';
+            projectForm.style.display = projectForm.style.display === 'block' ? 'none' : 'block';
+            projectForm.reset();
+        }
+
         divAdd.appendChild(projectBtn);
+        divAdd.appendChild(projectForm);
 
         div.appendChild(divTabs);
         div.appendChild(divAdd);

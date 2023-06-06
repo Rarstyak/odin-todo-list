@@ -11,7 +11,7 @@ body {
     grid: 
         "storage project" 10rem
         "list todo" 1fr
-        / 5rem 1fr;
+        / 15rem 1fr;
 }
 
 #storage-container {

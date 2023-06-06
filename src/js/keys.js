@@ -51,15 +51,15 @@ export default (function() {
         LOCAL_STORAGE_RESET, //Done
 
         DOM_UPDATE_LIST, //Done
-        DOM_UPDATE_PROJECT, //Imcomplete
-        DOM_UPDATE_TODO,
+        DOM_UPDATE_PROJECT, //Done
+        DOM_UPDATE_TODO, //Done
 
         LIST_SELECT, //Done
         TODO_TOGGLE,
 
         PROJECT_ADD, //Incomplete
         PROJECT_EDIT,
-        PROJECT_MOVE,
+        PROJECT_MOVE, //Uninplimented
         PROJECT_REMOVE,
 
         TODO_ADD,

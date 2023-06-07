@@ -63,7 +63,6 @@ const listModule = (function() {
             return btn;
         };
 
-        // New project form
         const addProjectForm = () => {
             const form = document.createElement('form');
             form.id = 'project-form'
@@ -115,7 +114,6 @@ const listModule = (function() {
 
             return form;
         }
-        //
 
         const projectBtn = addProjectBtn();
         const projectForm = addProjectForm();
@@ -251,15 +249,77 @@ const todoModule = (function() {
         const divAdd = document.createElement('div');
         divAdd.setAttribute('id', 'todo-add-container');
 
-
         const addTodoBtn = () => {
             const btn = document.createElement('button');
-            btn.textContent = 'Add Todo'
-            btn.addEventListener('click', () => PubSub.publish(Keys.TODO_ADD, {title: prompt('Todo Title', 'Test'), description: prompt('Todo Description', '')}));
+            btn.textContent = 'Add Todo';
+            btn.addEventListener('click', () => toggleBtnForm());
+            btn.style.display = 'block';
             return btn;
         };
-        const addBtn = addTodoBtn();
-        divAdd.appendChild(addBtn);
+
+        const addTodoForm = () => {
+            const form = document.createElement('form');
+            form.id = 'todo-form'
+            form.action = '';
+            form.method = 'get';
+
+            const title = document.createElement('input');
+            title.type = 'text';
+            title.name = 'title';
+            title.id = 'todo-form-title';
+            title.required = true;
+            title.placeholder = 'Todo Name';
+
+            const desc = document.createElement('input');
+            desc.type = 'text';
+            desc.name = 'desc';
+            desc.id = 'todo-form-desc';
+            desc.placeholder = 'Todo Description';
+
+            const cancel = document.createElement('button');
+            cancel.textContent = 'Cancel';
+            cancel.type = 'button';
+            cancel.addEventListener('click', () => toggleBtnForm());
+
+            const submit = document.createElement('button');
+            submit.textContent = 'Submit';
+
+            form.appendChild(title);
+            form.appendChild(desc);
+            form.appendChild(cancel);
+            form.appendChild(submit);
+
+            form.style.display = 'none';
+
+            form.addEventListener('submit', formSubmit);
+
+            function formSubmit(e) {
+                e.preventDefault();
+                // Validation here
+
+                // PubSub and clear form
+                PubSub.publish(Keys.TODO_ADD, {
+                    title: title.value,
+                    description: desc.value
+                });
+                
+                toggleBtnForm();
+            }
+
+            return form;
+        }
+
+        const toggleBtnForm = () => {
+            todoBtn.style.display = todoBtn.style.display === 'block' ? 'none' : 'block';
+            todoForm.style.display = todoForm.style.display === 'block' ? 'none' : 'block';
+            todoForm.reset();
+        }
+
+        const todoBtn = addTodoBtn();
+        const todoForm = addTodoForm();
+
+        divAdd.appendChild(todoBtn);
+        divAdd.appendChild(todoForm);
 
         div.appendChild(divCards);
         div.appendChild(divAdd);
@@ -288,10 +348,18 @@ const todoModule = (function() {
         description.classList.add('description');
         info.appendChild(description);
 
+        const priority = document.createElement('div');
+        priority.classList.add('priority');
+        info.appendChild(priority);
+
+        const dueDate = document.createElement('div');
+        dueDate.classList.add('dueDate');
+        info.appendChild(dueDate);
+
         const edit = document.createElement('button');
         edit.classList.add('edit');
         edit.textContent = 'Edit';
-        edit.addEventListener('click', () => PubSub.publish(Keys.TODO_EDIT, {title: prompt('New Title'), description: prompt('New Description'), index: index}));
+        edit.addEventListener('click', () => PubSub.publish(Keys.TODO_EDIT, {title: prompt('New Title', title.textContent), description: prompt('New Description', description.textContent), index: index}));
         card.appendChild(edit);
 
         const remove = document.createElement('button');
@@ -318,6 +386,12 @@ const todoModule = (function() {
 
         const description = todoCardRef.querySelector('.description');
         description.textContent = `${data.description}`;
+
+        const priority = todoCardRef.querySelector('.priority');
+        priority.textContent = `${data.priority}`;
+
+        const dueDate = todoCardRef.querySelector('.dueDate');
+        dueDate.textContent = `${data.dueDate}`;
 
         // title
             // description

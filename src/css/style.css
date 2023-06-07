@@ -22,6 +22,14 @@ body {
     grid-area: list;
 }
 
+.project-tab {
+    display: flex;
+}
+
+.project-tab-select {
+    flex: auto;
+}
+
 #project-container {
     grid-area: project;
 }

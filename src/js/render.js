@@ -144,12 +144,29 @@ const listModule = (function() {
         if (dataLen > tabRefLen) {
             // Add indexed tabs until equal
             for (let i = tabRefLen; i < dataLen; i+= 1) {
-                const tab = document.createElement('button');
+                const tab = document.createElement('div');
+                const select = document.createElement('button');
+                const edit = document.createElement('button');
+                const remove = document.createElement('button');
+
+                tab.classList.add('project-tab');
+                select.classList.add('project-tab-select');
+                select.classList.add('project-tab-edit');
+                remove.classList.add('project-tab-remove');
+
+                edit.textContent = 'e';
+                remove.textContent = 'x';
+
+                select.addEventListener('click', () => PubSub.publish(Keys.LIST_SELECT, i));
+                edit.addEventListener('click', () => PubSub.publish(Keys.PROJECT_EDIT, {title: prompt('title'), description: prompt('description'), index: i}));
+                remove.addEventListener('click', () => PubSub.publish(Keys.PROJECT_REMOVE, i));
+
+                tab.appendChild(select);
+                tab.appendChild(edit);
+                tab.appendChild(remove);
                 container.appendChild(tab);
+
                 _tabRef.push(tab);
-                // tab.setAttribute('data-tab-number', i); This is unnecessary if we can directly publish with an id
-                tab.addEventListener('click', () => PubSub.publish(Keys.LIST_SELECT, i));
-                tab.addEventListener('auxclick', () => PubSub.publish(Keys.PROJECT_REMOVE, i));
             }
         }
 
@@ -164,7 +181,7 @@ const listModule = (function() {
                 _tabRef[i].style.display = 'none';
             } else {
                 _tabRef[i].style.display = '';
-                _tabRef[i].textContent = data[i];
+                _tabRef[i].querySelector('.project-tab-select').textContent = data[i];
             }
         }
     };

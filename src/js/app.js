@@ -318,11 +318,12 @@ export default (function() {
     };
 
     const projectEditHandler = (msg, data) => {
-        const changed = _projects[_viewProjectID].update(
+        const changed = _projects[data.index].update(
             data.title,
             data.description
         );
         if (changed) {
+            _viewProjectID = data.index;
             publishList();
         }
     };

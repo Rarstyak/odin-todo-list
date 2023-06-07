@@ -156,7 +156,7 @@ const listModule = (function() {
                 remove.textContent = 'x';
 
                 select.addEventListener('click', () => PubSub.publish(Keys.LIST_SELECT, i));
-                edit.addEventListener('click', () => PubSub.publish(Keys.PROJECT_EDIT, {title: prompt('title'), description: prompt('description'), index: i}));
+                edit.addEventListener('click', () => PubSub.publish(Keys.PROJECT_EDIT, {title: prompt('title', select.textContent), index: i}));
                 remove.addEventListener('click', () => PubSub.publish(Keys.PROJECT_REMOVE, i));
 
                 tab.appendChild(select);
@@ -276,6 +276,42 @@ const todoModule = (function() {
             desc.id = 'todo-form-desc';
             desc.placeholder = 'Todo Description';
 
+            const priorityLow = document.createElement('input');
+            priorityLow.type = 'radio';
+            priorityLow.name = 'priority';
+            priorityLow.id = 'todo-form-priority-low';
+            priorityLow.value = 'LOW';
+
+            const priorityLowLabel = document.createElement('label');
+            priorityLowLabel.htmlFor = 'todo-form-priority-low';
+            priorityLowLabel.textContent = 'LOW';
+
+            const priorityMed = document.createElement('input');
+            priorityMed.type = 'radio';
+            priorityMed.name = 'priority';
+            priorityMed.id = 'todo-form-priority-med';
+            priorityMed.value = 'MEDIUM';
+
+            const priorityMedLabel = document.createElement('label');
+            priorityMedLabel.htmlFor = 'todo-form-priority-med';
+            priorityMedLabel.textContent = 'MEDIUM';
+
+            const priorityHigh = document.createElement('input');
+            priorityHigh.type = 'radio';
+            priorityHigh.name = 'priority';
+            priorityHigh.id = 'todo-form-priority-high';
+            priorityHigh.value = 'HIGH';
+
+            const priorityHighLabel = document.createElement('label');
+            priorityHighLabel.htmlFor = 'todo-form-priority-high';
+            priorityHighLabel.textContent = 'HIGH';
+
+            const dueDate = document.createElement('input');
+            dueDate.type = 'date';
+            dueDate.name = 'dueDate';
+            dueDate.id = 'todo-form-dueDate';
+            dueDate.required = true;
+
             const cancel = document.createElement('button');
             cancel.textContent = 'Cancel';
             cancel.type = 'button';
@@ -286,6 +322,17 @@ const todoModule = (function() {
 
             form.appendChild(title);
             form.appendChild(desc);
+
+            form.appendChild(priorityLow);
+            form.appendChild(priorityMed);
+            form.appendChild(priorityHigh);
+
+            form.appendChild(priorityLowLabel);
+            form.appendChild(priorityMedLabel);
+            form.appendChild(priorityHighLabel);
+
+            form.appendChild(dueDate);
+
             form.appendChild(cancel);
             form.appendChild(submit);
 

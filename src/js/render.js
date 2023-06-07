@@ -96,7 +96,7 @@ const listModule = (function() {
             form.appendChild(submit);
 
             form.style.display = 'none';
-
+            form.classList.add('full-screen');
             form.addEventListener('submit', formSubmit);
 
             function formSubmit(e) {
@@ -125,10 +125,11 @@ const listModule = (function() {
         }
 
         divAdd.appendChild(projectBtn);
-        divAdd.appendChild(projectForm);
 
         div.appendChild(divTabs);
         div.appendChild(divAdd);
+
+        document.querySelector('body').appendChild(projectForm);
 
         return div;
     };
@@ -337,7 +338,7 @@ const todoModule = (function() {
             form.appendChild(submit);
 
             form.style.display = 'none';
-
+            form.classList.add('full-screen');
             form.addEventListener('submit', formSubmit);
 
             function formSubmit(e) {
@@ -366,10 +367,11 @@ const todoModule = (function() {
         const todoForm = addTodoForm();
 
         divAdd.appendChild(todoBtn);
-        divAdd.appendChild(todoForm);
 
         div.appendChild(divCards);
         div.appendChild(divAdd);
+
+        document.querySelector('body').appendChild(todoForm);
 
         return div;
     };

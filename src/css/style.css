@@ -69,3 +69,11 @@ body {
 .todo-card .remove {
     grid-area: remove;
 }
+
+.full-screen {
+    position: absolute;
+    top:0px;
+    bottom:0px;
+    width: 100%;
+    background-color: teal;
+}

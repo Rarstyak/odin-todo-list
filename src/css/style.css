@@ -72,8 +72,24 @@ body {
 
 .full-screen {
     position: absolute;
-    top:0px;
-    bottom:0px;
+    top: 0px;
+    bottom: 0px;
     width: 100%;
     background-color: teal;
 }
+
+/* 
+
+#project-form
+#project-form-title
+#project-form-desc
+
+#todo-form
+#todo-form-title
+#todo-form-desc
+
+#todo-form
+#todo-form
+#todo-form-dueDate
+
+*/

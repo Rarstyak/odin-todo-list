@@ -69,6 +69,12 @@ const listModule = (function() {
             form.action = '';
             form.method = 'get';
 
+            const entryContainer = document.createElement('div');
+            entryContainer.id = 'project-form-entry-container'
+
+            const buttonContainer = document.createElement('div');
+            buttonContainer.id = 'project-form-entry-container'
+
             const title = document.createElement('input');
             title.type = 'text';
             title.name = 'title';
@@ -90,10 +96,14 @@ const listModule = (function() {
             const submit = document.createElement('button');
             submit.textContent = 'Submit';
 
-            form.appendChild(title);
-            form.appendChild(desc);
-            form.appendChild(cancel);
-            form.appendChild(submit);
+            form.appendChild(entryContainer);
+            form.appendChild(buttonContainer);
+
+            entryContainer.appendChild(title);
+            entryContainer.appendChild(desc);
+
+            buttonContainer.appendChild(cancel);
+            buttonContainer.appendChild(submit);
 
             form.style.display = 'none';
             form.classList.add('full-screen');
@@ -105,8 +115,8 @@ const listModule = (function() {
 
                 // PubSub and clear form
                 PubSub.publish(Keys.PROJECT_ADD, {
-                    title: title.value,
-                    description: desc.value
+                    title: e.currentTarget.title.value,
+                    description: e.currentTarget.desc.value
                 });
                 
                 toggleBtnForm();
@@ -264,6 +274,12 @@ const todoModule = (function() {
             form.action = '';
             form.method = 'get';
 
+            const entryContainer = document.createElement('div');
+            entryContainer.id = 'project-form-entry-container'
+
+            const buttonContainer = document.createElement('div');
+            buttonContainer.id = 'project-form-entry-container'
+
             const title = document.createElement('input');
             title.type = 'text';
             title.name = 'title';
@@ -321,21 +337,21 @@ const todoModule = (function() {
             const submit = document.createElement('button');
             submit.textContent = 'Submit';
 
-            form.appendChild(title);
-            form.appendChild(desc);
+            form.appendChild(entryContainer);
+            form.appendChild(buttonContainer);
 
-            form.appendChild(priorityLow);
-            form.appendChild(priorityMed);
-            form.appendChild(priorityHigh);
+            entryContainer.appendChild(title);
+            entryContainer.appendChild(desc);
+            entryContainer.appendChild(priorityLow);
+            entryContainer.appendChild(priorityMed);
+            entryContainer.appendChild(priorityHigh);
+            entryContainer.appendChild(priorityLowLabel);
+            entryContainer.appendChild(priorityMedLabel);
+            entryContainer.appendChild(priorityHighLabel);
+            entryContainer.appendChild(dueDate);
 
-            form.appendChild(priorityLowLabel);
-            form.appendChild(priorityMedLabel);
-            form.appendChild(priorityHighLabel);
-
-            form.appendChild(dueDate);
-
-            form.appendChild(cancel);
-            form.appendChild(submit);
+            buttonContainer.appendChild(cancel);
+            buttonContainer.appendChild(submit);
 
             form.style.display = 'none';
             form.classList.add('full-screen');
@@ -347,8 +363,10 @@ const todoModule = (function() {
 
                 // PubSub and clear form
                 PubSub.publish(Keys.TODO_ADD, {
-                    title: title.value,
-                    description: desc.value
+                    title: e.currentTarget.title.value,
+                    description: e.currentTarget.desc.value,
+                    dueDate: e.currentTarget.dueDate.value,
+                    priority: e.currentTarget.priority.value
                 });
                 
                 toggleBtnForm();
